@@ -20,14 +20,16 @@ def getRunningDesktopSession():
     desktopSession= os.environ.get('DESKTOP_SESSION')
     return desktopSession
     
-def extractImageNames(date):
+def extractImageUrls(date):
     pattern=re.compile(r"image\/\d{4}\/\w*\.jpg")
-    url=APODURLSTART+str(int(date)-2)+APODURLEND
+    url=APODURLSTART+str(int(date)-1)+APODURLEND
     logging.warning("opening url"+url)
     website=requests.get(url)
     html=website.text
     imgNames=pattern.findall(html)
-    return imgNames
+    return imgUrls
+
+def downloadFile()
 
 def getRandomPastDate():
     """returns a random date from the past year"""
@@ -40,6 +42,6 @@ def getCurrentDate():
 
 if __name__ == '__main__':
     logging.warning('started')
-    names=extractImageNames(getCurrentDate())    
+    imageUrls
     print(names)
-    
+
