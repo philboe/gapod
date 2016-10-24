@@ -38,6 +38,7 @@ def getNewWallpaper():
 
 
 def setNewBackground(filepath, desktopSession):
+    """sets WAllpaper acording to desktop session"""
     if 'gnome' in desktopSession:
         os.system("gsettings set org.gnome.desktop.background picture-uri file:"+filepath)
         os.system("gsettings set org.gnome.desktop.background picture-options stretched") 
@@ -48,12 +49,14 @@ def setNewBackground(filepath, desktopSession):
 
 
 def getEnvironmentVars():
+    """get environment vaiables from os"""
     desktopSession = os.environ.get('DESKTOP_SESSION')
     home = os.environ.get('HOME')
     return desktopSession, home
 
 
 def extractImageUrls(date):
+    """searches for valid picture (jpg) urls"""
     imgUrls = []
     logging.info(date)
     pattern = re.compile(r"image\/\d{4}\/\w*\.jpg")
