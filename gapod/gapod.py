@@ -13,6 +13,7 @@ import requests
 import re
 import logging
 import random
+import subprocess
 
 
 FIRSTAPOD = '19950616'
@@ -37,7 +38,13 @@ def getNewWallpaper():
 
 
 def setNewBackground(filepath, desktopSession):
+    if 'gnome' in desktopSession:
+        os.system("gsettings set org.gnome.desktop.background picture-uri file:"+filepath)
+        os.system("gsettings set org.gnome.desktop.background picture-options stretched") 
+    elif 'openbox'||'bspwm' in desktopSession:
+        os.system("feh --bg-fill "+filepath)
     print(filepath, desktopSession)
+
 
 
 def getEnvironmentVars():
