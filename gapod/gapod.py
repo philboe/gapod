@@ -13,13 +13,11 @@ import requests
 import re
 import logging
 import random
-import subprocess
-
+from gi.repository import Notify
 
 FIRSTAPOD = '19950616'
 APODURLSTART = 'http://apod.nasa.gov/apod/ap'
 APODURLEND = '.html'
-REGEX = re.compile(rb"image\/\d{4}\/\w*\.jpg")
 WALLPAPERDIR = '/Pictures/Wallpapers/'
 
 
@@ -30,22 +28,23 @@ def getNewWallpaper():
     logging.info("get current date")
     currentDate = getCurrentDate()
     logging.info("extracting possible image urls from apod site for currentDate="+currentDate)
-    imgUrls = extractImageUrls(currentDate)
-    logging.info("Find biigest file of %d images",len(imgUrls))
+    imgUrls, html = extractImageUrlsAndHtml(currentDate)
+    #imgUrls, html = extractImageUrlsAndHtml('161024')
+    logging.info("Find biigest file of %d images", len(imgUrls))
+    apodText = getApodText(html)
     filepath = getBiggestFile(imgUrls, wallpaperPath)
-    logging.info("Downloaded file %s, try to set it as wallpaper",filepath )
+    logging.info("Downloaded file %s, try to set it as wallpaper", filepath)
     setNewBackground(filepath, desktopSession)
+    sendNotification(apodText)
 
 
 def setNewBackground(filepath, desktopSession):
     """sets WAllpaper acording to desktop session"""
-    if 'gnome' in desktopSession:
+    if 'gnome' or 'ubuntu' in desktopSession:
         os.system("gsettings set org.gnome.desktop.background picture-uri file:"+filepath)
-        os.system("gsettings set org.gnome.desktop.background picture-options stretched") 
-    elif 'openbox'||'bspwm' in desktopSession:
+        os.system("gsettings set org.gnome.desktop.background picture-options stretched")
+    elif 'openbox' or 'bspwm' in desktopSession:
         os.system("feh --bg-fill "+filepath)
-    print(filepath, desktopSession)
-
 
 
 def getEnvironmentVars():
@@ -55,7 +54,7 @@ def getEnvironmentVars():
     return desktopSession, home
 
 
-def extractImageUrls(date):
+def extractImageUrlsAndHtml(date):
     """searches for valid picture (jpg) urls"""
     imgUrls = []
     logging.info(date)
@@ -67,9 +66,9 @@ def extractImageUrls(date):
     imgUrls = pattern.findall(html)
     logging.info("found images "+str(len(imgUrls)))
     if imgUrls:
-        return imgUrls
+        return imgUrls, html
     else:
-        extractImageUrls(getRandomPastDate())
+        extractImageUrlsAndHtml(getRandomPastDate())
 
 
 def getBiggestFile(imgUrls, wallpaperPath):
@@ -79,7 +78,7 @@ def getBiggestFile(imgUrls, wallpaperPath):
         response = requests.head(APODURLSTART[:-2]+imgUrl)
         files.update({imgUrl: response.headers.get('Content-Length')})
         logging.info(imgUrl[1]+" filesize is "+response.headers.get('Content-Length'))
-    biggestFile = max(files, key=lambda k: files[k])
+    biggestFile = max(files, key=lambda k: int(files[k]))
     logging.info("Biggest File is " + biggestFile[11:])
     logging.info("starting download of "+APODURLSTART[:-2]+biggestFile)
     image = requests.get(APODURLSTART[:-2]+biggestFile)
@@ -92,6 +91,21 @@ def getBiggestFile(imgUrls, wallpaperPath):
             logging.info("file written at "+filepath)
         del image
     return filepath
+
+
+def getApodText(html):
+    """Searches and returns for the Title of the current picture"""
+    pattern = re.compile(r"<b>\s(.+)\s\<\/b\>\s\<br>")
+    apodText = pattern.findall(html)
+    print(apodText)
+    return apodText[0]
+
+
+def sendNotification(apodText):
+    Notify.init("GAPOD")
+    notification = Notify.Notification.new('Astronomy Picture of the Day', apodText)
+    notification.set_timeout(Notify.EXPIRES_NEVER)
+    notification.show()
 
 
 def getRandomPastDate(start=FIRSTAPOD):
