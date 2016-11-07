@@ -22,6 +22,7 @@ WALLPAPERDIR = '/Pictures/Wallpapers/'
 
 
 def getNewWallpaper():
+
     logging.info("get environmet variables for home and desktop session")
     desktopSession, home = getEnvironmentVars()
     wallpaperPath = home+WALLPAPERDIR
@@ -29,7 +30,6 @@ def getNewWallpaper():
     currentDate = getCurrentDate()
     logging.info("extracting possible image urls from apod site for currentDate="+currentDate)
     imgUrls, html = extractImageUrlsAndHtml(currentDate)
-    #imgUrls, html = extractImageUrlsAndHtml('161024')
     logging.info("Find biigest file of %d images", len(imgUrls))
     apodText = getApodText(html)
     filepath = getBiggestFile(imgUrls, wallpaperPath)
@@ -39,7 +39,7 @@ def getNewWallpaper():
 
 
 def setNewBackground(filepath, desktopSession):
-    """sets WAllpaper acording to desktop session"""
+    """sets Wallpaper acording to desktop session"""
     if 'gnome' or 'ubuntu' in desktopSession:
         os.system("gsettings set org.gnome.desktop.background picture-uri file:"+filepath)
         os.system("gsettings set org.gnome.desktop.background picture-options stretched")
@@ -102,6 +102,7 @@ def getApodText(html):
 
 
 def sendNotification(apodText):
+    """ if available, tries to send notification with libnotify gobject binding"""
     Notify.init("GAPOD")
     notification = Notify.Notification.new('Astronomy Picture of the Day', apodText)
     notification.set_timeout(Notify.EXPIRES_NEVER)

@@ -2,7 +2,7 @@
 
 import distutils.core
 
-name = 'gapod'
+name = 'gapod.py'
 
 distutils.core.setup(name=name,
         version='1.0',
@@ -13,4 +13,4 @@ distutils.core.setup(name=name,
         long_description="",
         license="gpl",
         scripts=[name],
-        data_files=[('')])
+        py_modules=['gapod.py'])
