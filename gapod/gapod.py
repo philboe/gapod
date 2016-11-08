@@ -35,17 +35,20 @@ def getNewWallpaper():
     filepath = getBiggestFile(imgUrls, wallpaperPath)
     logging.info("Downloaded file %s, try to set it as wallpaper", filepath)
     setNewBackground(filepath, desktopSession)
-    sendNotification(apodText)
+#    sendNotification(apodText)
 
 
 def setNewBackground(filepath, desktopSession):
     """sets Wallpaper acording to desktop session"""
+    logging.info('your WM is '+ desktopSession)
     if 'gnome' or 'ubuntu' in desktopSession:
         os.system("gsettings set org.gnome.desktop.background picture-uri file:"+filepath)
         os.system("gsettings set org.gnome.desktop.background picture-options stretched")
-    elif 'openbox' or 'bspwm' in desktopSession:
+    if 'openbox' or 'bspwm' in desktopSession:
         os.system("feh --bg-fill "+filepath)
-
+    if 'sway' in desktopSession:
+        logging.info(' setting wallpaper in swaywm')
+        os.system("swaymsg output \"*\" background "+ filepath+' fill')
 
 def getEnvironmentVars():
     """get environment vaiables from os"""
