@@ -1,5 +1,0 @@
-README.rst
-gapod.py.egg-info/PKG-INFO
-gapod.py.egg-info/SOURCES.txt
-gapod.py.egg-info/dependency_links.txt
-gapod.py.egg-info/top_level.txt

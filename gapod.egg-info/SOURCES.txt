@@ -1,6 +1,0 @@
-README.rst
-gapod
-gapod.egg-info/PKG-INFO
-gapod.egg-info/SOURCES.txt
-gapod.egg-info/dependency_links.txt
-gapod.egg-info/top_level.txt
